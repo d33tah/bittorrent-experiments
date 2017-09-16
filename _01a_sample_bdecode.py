@@ -1,9 +1,17 @@
 #!/usr/bin/env python
 
+import hashlib
+hashobj = hashlib.sha1()
+is_info = False
+
 
 def file_read(f, n):
+    global is_info, hashobj
     # TODO: if global is_info is True, feed read data into hashlib.sha1()
-    return f.read(n)
+    ret = f.read(n)
+    if is_info:
+        hashobj.update(ret)
+    return ret
 
 
 def read_number_until(f, c):
@@ -20,7 +28,7 @@ def read_number_until(f, c):
 
 
 def get_val(f):
-    # global is_info
+    global is_info
     t = file_read(f, 1).decode('ascii')
     if t == 'e':
         return None
@@ -44,9 +52,9 @@ def get_val(f):
             key = get_val(f)
             if key is None:
                 return ret
-            # is_info = True if key == 'info' else is_info
+            is_info = True if key == 'info' else is_info
             value = get_val(f)
-            # is_info = False if key == 'info' else is_info
+            is_info = False if key == 'info' else is_info
             ret[key] = value
     else:
         raise ValueError("Unexpected type: %s" % repr(t))
@@ -58,3 +66,4 @@ if __name__ == '__main__':
     # Let's shorten it so that demo doesn't take whole screen...
     d['info']['pieces'] = d['info']['pieces'][:16] + '(and so on)'
     pprint.pprint(d)
+    pprint.pprint(hashobj.hexdigest())
