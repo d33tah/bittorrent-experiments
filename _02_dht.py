@@ -17,7 +17,10 @@ def dht_query(s, ip, port, info_hash):
         response_raw = s.recvfrom(1024)[0]
     except socket_error:  # timed out?
         return [], []
-    return interpret_dht_response(response_raw)
+    try:
+        return interpret_dht_response(response_raw)
+    except ValueError:
+        return [], []
 
 
 def id_to_ipport(node_id):
