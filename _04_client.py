@@ -66,7 +66,7 @@ if __name__ == '__main__':
 
     import base64
     import sys
-    import urlparse
+    import urllib.parse as urlparse
     if True:
         # https://thepiratebay.org/torrent/11274073/Ubuntu_14.10_desktop__x64
         info_hash = b'\xb4\x15\xc9\x13d>_\xf4\x9f\xe3}0K\xbb^n\x11\xadQ\x01'

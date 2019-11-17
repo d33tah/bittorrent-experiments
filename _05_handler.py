@@ -51,7 +51,7 @@ class BittorrentHandler(BaseBittorrentHandler):
         for piece in self.have:
             self._send_want(piece, 0)
 
-    def on_have(self, d):
+    def on_have(self, d, t=None):
         piece = unpack('>I', d)[0]
         debug('Got a HAVE: %d' % piece)
         self._handle_interested()
@@ -66,9 +66,9 @@ class BittorrentClient(BaseBittorrentClient):
     def __init__(self, info_hash, dht_ips, info_bdecoded, f, f_lock):
         BaseBittorrentClient.__init__(self, info_hash, dht_ips)
         self.info_bdecoded = info_bdecoded
-        self.piece_length = info_bdecoded['piece length']
-        self.num_pieces = len(info_bdecoded['pieces']) / 20
-        self.total_length = info_bdecoded['length']
+        self.piece_length = info_bdecoded[b'piece length']
+        self.num_pieces = len(info_bdecoded[b'pieces']) / 20
+        self.total_length = info_bdecoded[b'length']
         self.f = f
         self.f_lock = f_lock
 
@@ -84,15 +84,16 @@ if __name__ == '__main__':
     from _01_bdecode import bdecode_next_val
     getLogger().setLevel(DEBUG)
     infohash_obj = sha1()
-    torrent_bdecoded = bdecode_next_val(open(argv[1]), infohash_obj)
-    if 'info' in torrent_bdecoded:
-        info_bdecoded = torrent_bdecoded['info']
+    torrent_bdecoded = bdecode_next_val(open(argv[1], 'rb'), infohash_obj)
+    print(torrent_bdecoded)
+    if b'info' in torrent_bdecoded:
+        info_bdecoded = torrent_bdecoded[b'info']
     else:
         info_bdecoded = torrent_bdecoded
 
     f_lock = Lock()
-    f = open(info_bdecoded['name'], 'ab')
-    f.truncate(info_bdecoded['length'])
+    f = open(info_bdecoded[b'name'], 'ab')
+    f.truncate(info_bdecoded[b'length'])
 
     dht_ips = [(gethostbyname('router.bittorrent.com'), 6881)]
     BittorrentClient(infohash_obj.digest(), dht_ips, info_bdecoded,
