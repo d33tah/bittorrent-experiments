@@ -53,7 +53,7 @@ class BittorrentHandler(BaseBittorrentHandler):
         with self.f_lock:
             buf = self.f.read(self.piece_length)
             if len(buf) < self.piece_length:
-                buf += '\x00' * (self.piece_length - len(buf))
+                buf += b'\x00' * (self.piece_length - len(buf))
             offset = piece_idx * 20
             expected_hash = self.info_bdecoded[b'pieces'][offset:offset+20]
             actual_hash = hashlib.sha1(buf).digest()
